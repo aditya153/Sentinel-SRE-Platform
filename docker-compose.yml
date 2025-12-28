@@ -15,7 +15,7 @@ services:
       - agent-gateway
       - event-dispatcher
     networks:
-      - aegis-network
+      - sentinel-network
 
   # ═══════════════════════════════════════════════════════════════
   # EVENT DISPATCHER (Node.js)
@@ -33,7 +33,7 @@ services:
       - kafka
       - redis
     networks:
-      - aegis-network
+      - sentinel-network
 
   # ═══════════════════════════════════════════════════════════════
   # AGENT GATEWAY (FastAPI + CrewAI)
@@ -45,7 +45,7 @@ services:
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENROUTER_MODEL=openai/gpt-oss-20b:free
-      - DATABASE_URL=postgresql://aegis:aegis_secret_2024@postgres:5432/aegis
+      - DATABASE_URL=postgresql://sentinel:sentinel_secret_2024@postgres:5432/aegis
       - KAFKA_BROKERS=kafka:9092
       - REDIS_URL=redis://redis:6379
       - MCP_SERVER_URL=http://mcp-server:8001
@@ -57,7 +57,7 @@ services:
       - qdrant
       - mcp-server
     networks:
-      - aegis-network
+      - sentinel-network
 
   # ═══════════════════════════════════════════════════════════════
   # MCP TOOL SERVER
@@ -70,9 +70,9 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     volumes:
-      - ~/.kube:/root/.kube:ro  # For Kubernetes access
+      - ~/.kube:/root/.kube:ro # For Kubernetes access
     networks:
-      - aegis-network
+      - sentinel-network
 
   # ═══════════════════════════════════════════════════════════════
   # DATABASES
@@ -82,14 +82,14 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=aegis
+      - POSTGRES_USER=sentinel
       - POSTGRES_PASSWORD=aegis_secret_2024
-      - POSTGRES_DB=aegis
+      - POSTGRES_DB=sentinel
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
-      - aegis-network
+      - sentinel-network
 
   redis:
     image: redis:7-alpine
@@ -98,7 +98,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - aegis-network
+      - sentinel-network
 
   qdrant:
     image: qdrant/qdrant:latest
@@ -107,7 +107,7 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
-      - aegis-network
+      - sentinel-network
 
   # ═══════════════════════════════════════════════════════════════
   # MESSAGE QUEUE
@@ -118,7 +118,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - aegis-network
+      - sentinel-network
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -132,7 +132,7 @@ services:
     depends_on:
       - zookeeper
     networks:
-      - aegis-network
+      - sentinel-network
 
   # ═══════════════════════════════════════════════════════════════
   # OBSERVABILITY
@@ -145,7 +145,7 @@ services:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks:
-      - aegis-network
+      - sentinel-network
 
   grafana:
     image: grafana/grafana:latest
@@ -158,10 +158,10 @@ services:
     depends_on:
       - prometheus
     networks:
-      - aegis-network
+      - sentinel-network
 
 networks:
-  aegis-network:
+  sentinel-network:
     driver: bridge
 
 volumes:

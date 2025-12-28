@@ -1,4 +1,4 @@
--- Aegis Database Schema
+-- Sentinel Database Schema
 -- Run this on PostgreSQL initialization
 
 -- Enable UUID extension
